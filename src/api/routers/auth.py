@@ -18,7 +18,7 @@ async def login(data: LoginData, response: Response, db: AsyncSession = Depends(
     user = result.scalar_one_or_none()
     if not user or not verify_password(data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Identifiants incorrects")
-    token = create_token({"sub": user.id, "role": user.role, "nom": user.nom})
+    token = create_token({"sub": str(user.id), "role": user.role, "nom": user.nom})
     response.set_cookie(
         key="access_token",
         value=token,
