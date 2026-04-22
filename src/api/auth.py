@@ -28,19 +28,16 @@ def create_token(data: dict) -> str:
 def decode_token(token: str) -> Optional[dict]:
     try:
         return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    except JWTError as e:
-        print("ERREUR JWT:", e)
+    except JWTError:
         return None
 
 async def get_current_user(
     access_token: Optional[str] = Cookie(default=None),
     db: AsyncSession = Depends(get_db)
 ) -> User:
-    print("TOKEN REÇU PAR FASTAPI:", access_token)
     if not access_token:
         raise HTTPException(status_code=401, detail="Non authentifié")
     payload = decode_token(access_token)
-    print("PAYLOAD DÉCODÉ:", payload)
     if not payload:
         raise HTTPException(status_code=401, detail="Token invalide")
     result = await db.execute(select(User).where(User.id == int(payload.get("sub"))))

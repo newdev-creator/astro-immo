@@ -3,10 +3,8 @@ import Dashboard from "../../../layouts/Dashboard.astro";
 import { apiFetch } from "../../../lib/api";
 
 const cookie = Astro.request.headers.get("cookie");
-console.log("COOKIE REÇU PAR ASTRO:", cookie);
 
 const res = await apiFetch("/api/biens/", Astro.request);
-console.log("STATUS FASTAPI:", res.status);
 const biens = res.ok ? await res.json() : [];
 ---
 <Dashboard>
