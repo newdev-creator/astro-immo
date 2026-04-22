@@ -232,3 +232,7 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 .vercel
+
+# SQLite database files
+*.db
+*.sqlite
