@@ -1,0 +1,61 @@
+---
+import '../styles/global.css' 
+const user = Astro.locals.user!;
+const isPatron = user.role === "patron";
+const currentPath = Astro.url.pathname;
+
+function isActive(path: string) {
+  return currentPath.startsWith(path) ? "active" : "";
+}
+---
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Immo Dashboard</title>
+  </head>
+  <body class="min-h-screen bg-base-200 flex">
+
+    <!-- Sidebar -->
+    <aside class="w-64 min-h-screen bg-base-100 shadow flex flex-col">
+      <div class="p-6 border-b border-base-200">
+        <h1 class="text-xl font-bold">Immo Agence</h1>
+        <p class="text-sm text-base-content/60 mt-1">{user.nom}</p>
+        <span class="badge badge-sm mt-1">
+          {isPatron ? "Patron" : "Agent"}
+        </span>
+      </div>
+
+      <nav class="flex-1 p-4 flex flex-col gap-1">
+        <a href="/dashboard" class={`btn btn-ghost btn-sm justify-start ${isActive("/dashboard")}`}>
+          Tableau de bord
+        </a>
+        <a href="/dashboard/biens" class={`btn btn-ghost btn-sm justify-start ${isActive("/dashboard/biens")}`}>
+          Mes biens
+        </a>
+        <a href="/dashboard/clients" class={`btn btn-ghost btn-sm justify-start ${isActive("/dashboard/clients")}`}>
+          Mes clients
+        </a>
+        {isPatron && (
+          <div class="divider my-2">Admin</div>
+          <a href="/dashboard/admin/agents" class={`btn btn-ghost btn-sm justify-start ${isActive("/dashboard/admin")}`}>
+            Agents
+          </a>
+        )}
+      </nav>
+
+      <div class="p-4 border-t border-base-200">
+        <form method="POST" action="/api/auth/logout">
+          <button class="btn btn-ghost btn-sm w-full">Se déconnecter</button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- Contenu -->
+    <main class="flex-1 p-8">
+      <slot />
+    </main>
+
+  </body>
+</html>
