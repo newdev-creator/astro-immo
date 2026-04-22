@@ -1,6 +1,7 @@
-def main():
-    print("Hello from astro-immo!")
+from fastapi import FastAPI
 
+app = FastAPI()
 
-if __name__ == "__main__":
-    main()
+@app.get("/api/health")
+def health():
+    return {"status": "ok"}
