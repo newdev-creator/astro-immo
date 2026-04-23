@@ -1,17 +1,17 @@
 ---
+import Public from "@layouts/Public.astro";
+
 const { id } = Astro.params;
 const res = await fetch(`http://localhost:8000/api/biens/publics/${id}`);
 if (!res.ok) return Astro.redirect("/biens");
 const bien = await res.json();
-import Layout from "@layouts/Layout.astro";
 ---
 
-<Layout>
+<Public title={`${bien.titre} — Immo Agence`}>
     <main class="max-w-4xl mx-auto px-8 py-12">
         <a href="/biens" class="btn btn-ghost btn-sm mb-6">← Retour</a>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Image -->
             <div>
                 {
                     bien.image_url ? (
@@ -30,7 +30,6 @@ import Layout from "@layouts/Layout.astro";
                 }
             </div>
 
-            <!-- Détails -->
             <div class="flex flex-col gap-4">
                 <div>
                     <span class="badge badge-ghost capitalize mb-2"
@@ -78,4 +77,4 @@ import Layout from "@layouts/Layout.astro";
             </div>
         </div>
     </main>
-</Layout>
+</Public>

@@ -1,4 +1,5 @@
 import asyncio
+import selectors
 
 from .auth import hash_password
 from .database import SessionLocal, init_db
@@ -21,3 +22,8 @@ async def seed():
 
 
 asyncio.run(seed())
+
+# Fix Windows ProactorEventLoop
+asyncio.run(
+    seed(), loop_factory=lambda: asyncio.SelectorEventLoop(selectors.SelectSelector())
+)

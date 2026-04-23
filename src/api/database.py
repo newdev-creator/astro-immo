@@ -1,12 +1,26 @@
+import os
+import re
 from typing import AsyncGenerator
 
+from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from .models import Base
 
-DATABASE_URL = "sqlite+aiosqlite:///./immo.db"
+load_dotenv()
 
-engine = create_async_engine(DATABASE_URL, echo=True)
+raw_url = os.getenv("DATABASE_URL")
+
+if raw_url and raw_url.startswith("postgresql"):
+    # Neon : postgresql -> postgresql+psycopg
+    DATABASE_URL = re.sub(r"^postgresql:", "postgresql+psycopg:", raw_url)
+    connect_args = {}
+else:
+    # Dev local : SQLite
+    DATABASE_URL = "sqlite+aiosqlite:///./immo.db"
+    connect_args = {}
+
+engine = create_async_engine(DATABASE_URL, echo=False, connect_args=connect_args)
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
 

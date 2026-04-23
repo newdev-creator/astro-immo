@@ -1,9 +1,10 @@
 ---
+import Public from "@layouts/Public.astro";
+
 const { searchParams } = Astro.url;
 const type_bien = searchParams.get("type_bien") ?? "";
 const ville = searchParams.get("ville") ?? "";
 const prix_max = searchParams.get("prix_max") ?? "";
-import Layout from "@layouts/Layout.astro";
 
 const params = new URLSearchParams();
 if (type_bien) params.set("type_bien", type_bien);
@@ -14,11 +15,10 @@ const res = await fetch(`http://localhost:8000/api/biens/publics?${params}`);
 const biens = res.ok ? await res.json() : [];
 ---
 
-<Layout>
+<Public title="Nos biens — Immo Agence">
     <main class="max-w-6xl mx-auto px-8 py-12">
         <h1 class="text-3xl font-bold mb-8">Nos biens disponibles</h1>
 
-        <!-- Filtres -->
         <form
             method="GET"
             class="card bg-base-200 p-4 mb-8 flex flex-wrap gap-4 items-end"
@@ -71,7 +71,6 @@ const biens = res.ok ? await res.json() : [];
             <a href="/biens" class="btn btn-ghost btn-sm">Réinitialiser</a>
         </form>
 
-        <!-- Résultats -->
         {
             biens.length === 0 ? (
                 <div class="alert">
@@ -124,4 +123,4 @@ const biens = res.ok ? await res.json() : [];
             )
         }
     </main>
-</Layout>
+</Public>

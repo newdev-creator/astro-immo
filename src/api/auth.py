@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -10,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .database import get_db
 from .models import Role, User
 
-SECRET_KEY = "change-moi-en-prod"
+SECRET_KEY = os.getenv("SECRET_KEY", "fallback-dev-key-32-chars-minimum!")
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_HOURS = 8
 

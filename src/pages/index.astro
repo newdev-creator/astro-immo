@@ -1,11 +1,86 @@
 ---
-import Welcome from "@components/Welcome.astro";
-import Layout from "@layouts/Layout.astro";
+import Public from "@layouts/Public.astro";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const res = await fetch("http://localhost:8000/api/biens/publics");
+const biens = res.ok ? await res.json() : [];
+const biensRecents = biens.slice(0, 3);
 ---
 
-<Layout>
-    <Welcome />
-</Layout>
+<Public title="Immo Agence">
+    <section class="hero min-h-96 bg-base-200">
+        <div class="hero-content text-center">
+            <div class="max-w-lg">
+                <h1 class="text-5xl font-bold">Trouvez votre bien idéal</h1>
+                <p class="py-6 text-base-content/70">
+                    Appartements, maisons, terrains — nous accompagnons vos
+                    projets immobiliers.
+                </p>
+                <a href="/biens" class="btn btn-primary">Voir nos biens</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-6xl mx-auto px-8 py-16">
+        <h2 class="text-3xl font-bold mb-8">Biens disponibles</h2>
+        {
+            biensRecents.length === 0 ? (
+                <p class="text-base-content/60">
+                    Aucun bien disponible pour le moment.
+                </p>
+            ) : (
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {biensRecents.map((b: any) => (
+                        <a
+                            href={`/biens/${b.id}`}
+                            class="card bg-base-100 shadow hover:shadow-lg transition-shadow"
+                        >
+                            {b.image_url ? (
+                                <figure>
+                                    <img
+                                        src={b.image_url}
+                                        alt={b.titre}
+                                        class="w-full h-48 object-cover"
+                                    />
+                                </figure>
+                            ) : (
+                                <div class="w-full h-48 bg-base-200 flex items-center justify-center">
+                                    <span class="text-base-content/30">
+                                        Pas de photo
+                                    </span>
+                                </div>
+                            )}
+                            <div class="card-body">
+                                <h3 class="card-title text-base">{b.titre}</h3>
+                                <p class="text-sm text-base-content/60">
+                                    {b.ville ?? "—"}
+                                </p>
+                                <p class="text-lg font-bold text-primary">
+                                    {b.prix.toLocaleString("fr-FR")} €
+                                </p>
+                                <div class="flex gap-2 mt-1">
+                                    <span class="badge badge-ghost badge-sm capitalize">
+                                        {b.type_bien}
+                                    </span>
+                                    {b.surface && (
+                                        <span class="badge badge-ghost badge-sm">
+                                            {b.surface} m²
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+            )
+        }
+        {
+            biens.length > 3 && (
+                <div class="text-center mt-8">
+                    <a href="/biens" class="btn btn-outline">
+                        Voir tous les biens
+                    </a>
+                </div>
+            )
+        }
+    </section>
+</Public>
