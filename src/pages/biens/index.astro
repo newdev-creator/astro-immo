@@ -1,0 +1,127 @@
+---
+const { searchParams } = Astro.url;
+const type_bien = searchParams.get("type_bien") ?? "";
+const ville = searchParams.get("ville") ?? "";
+const prix_max = searchParams.get("prix_max") ?? "";
+import Layout from "@layouts/Layout.astro";
+
+const params = new URLSearchParams();
+if (type_bien) params.set("type_bien", type_bien);
+if (ville) params.set("ville", ville);
+if (prix_max) params.set("prix_max", prix_max);
+
+const res = await fetch(`http://localhost:8000/api/biens/publics?${params}`);
+const biens = res.ok ? await res.json() : [];
+---
+
+<Layout>
+    <main class="max-w-6xl mx-auto px-8 py-12">
+        <h1 class="text-3xl font-bold mb-8">Nos biens disponibles</h1>
+
+        <!-- Filtres -->
+        <form
+            method="GET"
+            class="card bg-base-200 p-4 mb-8 flex flex-wrap gap-4 items-end"
+        >
+            <div class="form-control">
+                <label class="label"><span class="label-text">Type</span></label
+                >
+                <select
+                    name="type_bien"
+                    class="select select-bordered select-sm"
+                >
+                    <option value="">Tous</option>
+                    {
+                        ["appartement", "maison", "terrain", "commercial"].map(
+                            (t) => (
+                                <option value={t} selected={type_bien === t}>
+                                    {t}
+                                </option>
+                            ),
+                        )
+                    }
+                </select>
+            </div>
+            <div class="form-control">
+                <label class="label"
+                    ><span class="label-text">Ville</span></label
+                >
+                <input
+                    name="ville"
+                    type="text"
+                    placeholder="Ex: Lyon"
+                    class="input input-bordered input-sm"
+                    value={ville}
+                />
+            </div>
+            <div class="form-control">
+                <label class="label"
+                    ><span class="label-text">Budget max (€)</span></label
+                >
+                <input
+                    name="prix_max"
+                    type="number"
+                    placeholder="Ex: 300000"
+                    class="input input-bordered input-sm"
+                    value={prix_max}
+                />
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Filtrer</button
+            >
+            <a href="/biens" class="btn btn-ghost btn-sm">Réinitialiser</a>
+        </form>
+
+        <!-- Résultats -->
+        {
+            biens.length === 0 ? (
+                <div class="alert">
+                    Aucun bien ne correspond à vos critères.
+                </div>
+            ) : (
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {biens.map((b: any) => (
+                        <a
+                            href={`/biens/${b.id}`}
+                            class="card bg-base-100 shadow hover:shadow-lg transition-shadow"
+                        >
+                            {b.image_url ? (
+                                <figure>
+                                    <img
+                                        src={b.image_url}
+                                        alt={b.titre}
+                                        class="w-full h-48 object-cover"
+                                    />
+                                </figure>
+                            ) : (
+                                <div class="w-full h-48 bg-base-200 flex items-center justify-center">
+                                    <span class="text-base-content/30">
+                                        Pas de photo
+                                    </span>
+                                </div>
+                            )}
+                            <div class="card-body">
+                                <h3 class="card-title text-base">{b.titre}</h3>
+                                <p class="text-sm text-base-content/60">
+                                    {b.ville ?? "—"}
+                                </p>
+                                <p class="text-lg font-bold text-primary">
+                                    {b.prix.toLocaleString("fr-FR")} €
+                                </p>
+                                <div class="flex gap-2 mt-1">
+                                    <span class="badge badge-ghost badge-sm capitalize">
+                                        {b.type_bien}
+                                    </span>
+                                    {b.surface && (
+                                        <span class="badge badge-ghost badge-sm">
+                                            {b.surface} m²
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+            )
+        }
+    </main>
+</Layout>

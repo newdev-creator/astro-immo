@@ -3,17 +3,27 @@ import "../styles/global.css";
 ---
 
 <!doctype html>
-<html lang="fr" data-theme="light">
+<html lang="fr">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="icon" href="/favicon.ico" />
-        <meta name="generator" content={Astro.generator} />
-        <title>Astro Basics</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Immo Agence</title>
     </head>
-    <body>
+    <body class="min-h-screen bg-base-100">
+        <!-- Navbar -->
+        <nav class="navbar bg-base-100 shadow px-8">
+            <div class="flex-1">
+                <a href="/" class="text-xl font-bold">Immo Agence</a>
+            </div>
+            <div class="flex gap-4">
+                <a href="/biens" class="btn btn-ghost btn-sm">Nos biens</a>
+                <a href="/login" class="btn btn-primary btn-sm">Espace agent</a>
+            </div>
+        </nav>
         <slot />
+        <footer class="footer footer-center bg-base-200 p-8 mt-16">
+            <p class="text-base-content/60">© 2026 Immo Agence</p>
+        </footer>
     </body>
 </html>
 

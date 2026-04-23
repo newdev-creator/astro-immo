@@ -13,6 +13,26 @@ if (Astro.request.method === "POST") {
         return Astro.redirect("/dashboard/biens");
     }
 
+    if (action === "upload") {
+        const file = form.get("image") as File;
+        if (file && file.size > 0) {
+            const cookie = Astro.request.headers.get("cookie") ?? "";
+            const accessToken =
+                cookie
+                    .split(";")
+                    .find((c) => c.trim().startsWith("access_token="))
+                    ?.trim() ?? "";
+            const formData = new FormData();
+            formData.append("file", file);
+            await fetch(`http://localhost:8000/api/biens/${id}/image`, {
+                method: "POST",
+                headers: { cookie: accessToken },
+                body: formData,
+            });
+        }
+        return Astro.redirect(`/dashboard/biens/${id}/modifier`);
+    }
+
     const res = await apiFetch(`/api/biens/${id}`, Astro.request, {
         method: "PUT",
         body: JSON.stringify({
@@ -52,6 +72,41 @@ const bien = await res.json();
             </form>
         </div>
 
+        <!-- Upload image séparé -->
+        <div class="card bg-base-100 shadow p-6 mb-4">
+            <h3 class="font-semibold mb-3">Photo du bien</h3>
+            {
+                bien.image_url ? (
+                    <img
+                        src={bien.image_url}
+                        alt={bien.titre}
+                        class="w-full h-48 object-cover rounded mb-3"
+                    />
+                ) : (
+                    <div class="w-full h-48 bg-base-200 rounded flex items-center justify-center mb-3">
+                        <span class="text-base-content/40">Aucune photo</span>
+                    </div>
+                )
+            }
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+                class="flex gap-2"
+            >
+                <input type="hidden" name="_action" value="upload" />
+                <input
+                    name="image"
+                    type="file"
+                    accept="image/*"
+                    class="file-input file-input-bordered flex-1"
+                />
+                <button type="submit" class="btn btn-secondary btn-sm"
+                    >Uploader</button
+                >
+            </form>
+        </div>
+
+        <!-- Formulaire principal -->
         <form
             method="POST"
             class="card bg-base-100 shadow p-6 flex flex-col gap-4"

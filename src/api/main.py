@@ -1,6 +1,9 @@
 from contextlib import asynccontextmanager
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
+
+load_dotenv()
 
 from .database import init_db
 from .routers.agents import router as agents_router
