@@ -8,7 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import get_db
-from .models import User
+from .models import Role, User
 
 SECRET_KEY = "change-moi-en-prod"
 ALGORITHM = "HS256"
@@ -61,6 +61,6 @@ async def get_current_user(
 
 
 async def require_patron(user: User = Depends(get_current_user)) -> User:
-    if str(user.role) != "patron":
+    if user.role != Role.patron:
         raise HTTPException(status_code=403, detail="Accès réservé au patron")
     return user
