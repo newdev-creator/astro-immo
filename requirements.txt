@@ -8,8 +8,6 @@ annotated-types==0.7.0
     # via pydantic
 anyio==4.13.0
     # via starlette
-asyncpg==0.31.0
-    # via astro-immo (pyproject.toml)
 bcrypt==5.0.0
     # via astro-immo (pyproject.toml)
 certifi==2026.4.22
@@ -28,6 +26,10 @@ h11==0.16.0
     # via uvicorn
 idna==3.13
     # via anyio
+psycopg==3.3.3
+    # via astro-immo (pyproject.toml)
+psycopg-binary==3.3.3
+    # via psycopg
 pydantic==2.13.3
     # via fastapi
 pydantic-core==2.46.3
@@ -48,6 +50,7 @@ typing-extensions==4.15.0
     # via
     #   anyio
     #   fastapi
+    #   psycopg
     #   pydantic
     #   pydantic-core
     #   sqlalchemy
@@ -57,6 +60,8 @@ typing-inspection==0.4.2
     # via
     #   fastapi
     #   pydantic
+tzdata==2026.1
+    # via psycopg
 urllib3==2.6.3
     # via cloudinary
 uvicorn==0.45.0
