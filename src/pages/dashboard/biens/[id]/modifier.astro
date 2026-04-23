@@ -2,10 +2,19 @@
 import Dashboard from "@layouts/Dashboard.astro";
 import { apiFetch } from "@lib/api";
 
+const { id } = Astro.params;
+
 if (Astro.request.method === "POST") {
     const form = await Astro.request.formData();
-    const res = await apiFetch("/api/biens/", Astro.request, {
-        method: "POST",
+    const action = form.get("_action");
+
+    if (action === "delete") {
+        await apiFetch(`/api/biens/${id}`, Astro.request, { method: "DELETE" });
+        return Astro.redirect("/dashboard/biens");
+    }
+
+    const res = await apiFetch(`/api/biens/${id}`, Astro.request, {
+        method: "PUT",
         body: JSON.stringify({
             titre: form.get("titre"),
             description: form.get("description"),
@@ -21,11 +30,27 @@ if (Astro.request.method === "POST") {
     });
     if (res.ok) return Astro.redirect("/dashboard/biens");
 }
+
+const res = await apiFetch(`/api/biens/${id}`, Astro.request);
+if (!res.ok) return Astro.redirect("/dashboard/biens");
+const bien = await res.json();
 ---
 
 <Dashboard>
     <div class="max-w-2xl">
-        <h2 class="text-2xl font-bold mb-6">Nouveau bien</h2>
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Modifier le bien</h2>
+            <form method="POST">
+                <input type="hidden" name="_action" value="delete" />
+                <button
+                    type="submit"
+                    class="btn btn-error btn-sm"
+                    onclick="return confirm('Supprimer ce bien ?')"
+                >
+                    Supprimer
+                </button>
+            </form>
+        </div>
 
         <form
             method="POST"
@@ -39,6 +64,7 @@ if (Astro.request.method === "POST") {
                     name="titre"
                     type="text"
                     class="input input-bordered"
+                    value={bien.titre}
                     required
                 />
             </div>
@@ -49,7 +75,10 @@ if (Astro.request.method === "POST") {
                 <textarea
                     name="description"
                     class="textarea textarea-bordered"
-                    rows="3"></textarea>
+                    rows="3"
+                >
+                    {bien.description}
+                </textarea>
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div class="form-control">
@@ -61,6 +90,7 @@ if (Astro.request.method === "POST") {
                         type="number"
                         step="0.01"
                         class="input input-bordered"
+                        value={bien.prix}
                         required
                     />
                 </div>
@@ -73,6 +103,7 @@ if (Astro.request.method === "POST") {
                         type="number"
                         step="0.01"
                         class="input input-bordered"
+                        value={bien.surface}
                     />
                 </div>
             </div>
@@ -85,6 +116,7 @@ if (Astro.request.method === "POST") {
                         name="ville"
                         type="text"
                         class="input input-bordered"
+                        value={bien.ville}
                     />
                 </div>
                 <div class="form-control">
@@ -95,6 +127,7 @@ if (Astro.request.method === "POST") {
                         name="adresse"
                         type="text"
                         class="input input-bordered"
+                        value={bien.adresse}
                     />
                 </div>
             </div>
@@ -104,10 +137,21 @@ if (Astro.request.method === "POST") {
                         ><span class="label-text">Type</span></label
                     >
                     <select name="type_bien" class="select select-bordered">
-                        <option value="appartement">Appartement</option>
-                        <option value="maison">Maison</option>
-                        <option value="terrain">Terrain</option>
-                        <option value="commercial">Commercial</option>
+                        {
+                            [
+                                "appartement",
+                                "maison",
+                                "terrain",
+                                "commercial",
+                            ].map((t) => (
+                                <option
+                                    value={t}
+                                    selected={bien.type_bien === t}
+                                >
+                                    {t}
+                                </option>
+                            ))
+                        }
                     </select>
                 </div>
                 <div class="form-control">
@@ -115,16 +159,20 @@ if (Astro.request.method === "POST") {
                         ><span class="label-text">Statut</span></label
                     >
                     <select name="statut" class="select select-bordered">
-                        <option value="disponible">Disponible</option>
-                        <option value="vendu">Vendu</option>
-                        <option value="loue">Loué</option>
+                        {
+                            ["disponible", "vendu", "loue"].map((s) => (
+                                <option value={s} selected={bien.statut === s}>
+                                    {s}
+                                </option>
+                            ))
+                        }
                     </select>
                 </div>
             </div>
             <div class="flex gap-2 justify-end mt-2">
                 <a href="/dashboard/biens" class="btn btn-ghost">Annuler</a>
                 <button type="submit" class="btn btn-primary"
-                    >Créer le bien</button
+                    >Enregistrer</button
                 >
             </div>
         </form>
