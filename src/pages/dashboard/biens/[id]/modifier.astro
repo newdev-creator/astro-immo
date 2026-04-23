@@ -1,0 +1,235 @@
+---
+import Dashboard from "@layouts/Dashboard.astro";
+import { apiFetch } from "@lib/api";
+
+const { id } = Astro.params;
+
+if (Astro.request.method === "POST") {
+    const form = await Astro.request.formData();
+    const action = form.get("_action");
+
+    if (action === "delete") {
+        await apiFetch(`/api/biens/${id}`, Astro.request, { method: "DELETE" });
+        return Astro.redirect("/dashboard/biens");
+    }
+
+    if (action === "upload") {
+        const file = form.get("image") as File;
+        if (file && file.size > 0) {
+            const cookie = Astro.request.headers.get("cookie") ?? "";
+            const accessToken =
+                cookie
+                    .split(";")
+                    .find((c) => c.trim().startsWith("access_token="))
+                    ?.trim() ?? "";
+            const formData = new FormData();
+            formData.append("file", file);
+            await fetch(`http://localhost:8000/api/biens/${id}/image`, {
+                method: "POST",
+                headers: { cookie: accessToken },
+                body: formData,
+            });
+        }
+        return Astro.redirect(`/dashboard/biens/${id}/modifier`);
+    }
+
+    const res = await apiFetch(`/api/biens/${id}`, Astro.request, {
+        method: "PUT",
+        body: JSON.stringify({
+            titre: form.get("titre"),
+            description: form.get("description"),
+            prix: parseFloat(form.get("prix") as string),
+            surface: form.get("surface")
+                ? parseFloat(form.get("surface") as string)
+                : null,
+            ville: form.get("ville"),
+            adresse: form.get("adresse"),
+            type_bien: form.get("type_bien"),
+            statut: form.get("statut"),
+        }),
+    });
+    if (res.ok) return Astro.redirect("/dashboard/biens");
+}
+
+const res = await apiFetch(`/api/biens/${id}`, Astro.request);
+if (!res.ok) return Astro.redirect("/dashboard/biens");
+const bien = await res.json();
+---
+
+<Dashboard>
+    <div class="max-w-2xl">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Modifier le bien</h2>
+            <form method="POST">
+                <input type="hidden" name="_action" value="delete" />
+                <button
+                    type="submit"
+                    class="btn btn-error btn-sm"
+                    onclick="return confirm('Supprimer ce bien ?')"
+                >
+                    Supprimer
+                </button>
+            </form>
+        </div>
+
+        <!-- Upload image séparé -->
+        <div class="card bg-base-100 shadow p-6 mb-4">
+            <h3 class="font-semibold mb-3">Photo du bien</h3>
+            {
+                bien.image_url ? (
+                    <img
+                        src={bien.image_url}
+                        alt={bien.titre}
+                        class="w-full h-48 object-cover rounded mb-3"
+                    />
+                ) : (
+                    <div class="w-full h-48 bg-base-200 rounded flex items-center justify-center mb-3">
+                        <span class="text-base-content/40">Aucune photo</span>
+                    </div>
+                )
+            }
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+                class="flex gap-2"
+            >
+                <input type="hidden" name="_action" value="upload" />
+                <input
+                    name="image"
+                    type="file"
+                    accept="image/*"
+                    class="file-input file-input-bordered flex-1"
+                />
+                <button type="submit" class="btn btn-secondary btn-sm"
+                    >Uploader</button
+                >
+            </form>
+        </div>
+
+        <!-- Formulaire principal -->
+        <form
+            method="POST"
+            class="card bg-base-100 shadow p-6 flex flex-col gap-4"
+        >
+            <div class="form-control">
+                <label class="label"
+                    ><span class="label-text">Titre *</span></label
+                >
+                <input
+                    name="titre"
+                    type="text"
+                    class="input input-bordered"
+                    value={bien.titre}
+                    required
+                />
+            </div>
+            <div class="form-control">
+                <label class="label"
+                    ><span class="label-text">Description</span></label
+                >
+                <textarea
+                    name="description"
+                    class="textarea textarea-bordered"
+                    rows="3"
+                >
+                    {bien.description}
+                </textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label"
+                        ><span class="label-text">Prix (€) *</span></label
+                    >
+                    <input
+                        name="prix"
+                        type="number"
+                        step="0.01"
+                        class="input input-bordered"
+                        value={bien.prix}
+                        required
+                    />
+                </div>
+                <div class="form-control">
+                    <label class="label"
+                        ><span class="label-text">Surface (m²)</span></label
+                    >
+                    <input
+                        name="surface"
+                        type="number"
+                        step="0.01"
+                        class="input input-bordered"
+                        value={bien.surface}
+                    />
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label"
+                        ><span class="label-text">Ville</span></label
+                    >
+                    <input
+                        name="ville"
+                        type="text"
+                        class="input input-bordered"
+                        value={bien.ville}
+                    />
+                </div>
+                <div class="form-control">
+                    <label class="label"
+                        ><span class="label-text">Adresse</span></label
+                    >
+                    <input
+                        name="adresse"
+                        type="text"
+                        class="input input-bordered"
+                        value={bien.adresse}
+                    />
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label"
+                        ><span class="label-text">Type</span></label
+                    >
+                    <select name="type_bien" class="select select-bordered">
+                        {
+                            [
+                                "appartement",
+                                "maison",
+                                "terrain",
+                                "commercial",
+                            ].map((t) => (
+                                <option
+                                    value={t}
+                                    selected={bien.type_bien === t}
+                                >
+                                    {t}
+                                </option>
+                            ))
+                        }
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label class="label"
+                        ><span class="label-text">Statut</span></label
+                    >
+                    <select name="statut" class="select select-bordered">
+                        {
+                            ["disponible", "vendu", "loue"].map((s) => (
+                                <option value={s} selected={bien.statut === s}>
+                                    {s}
+                                </option>
+                            ))
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="flex gap-2 justify-end mt-2">
+                <a href="/dashboard/biens" class="btn btn-ghost">Annuler</a>
+                <button type="submit" class="btn btn-primary"
+                    >Enregistrer</button
+                >
+            </div>
+        </form>
+    </div>
+</Dashboard>

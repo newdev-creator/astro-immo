@@ -1,0 +1,80 @@
+---
+import Public from "@layouts/Public.astro";
+
+const { id } = Astro.params;
+const res = await fetch(`http://localhost:8000/api/biens/publics/${id}`);
+if (!res.ok) return Astro.redirect("/biens");
+const bien = await res.json();
+---
+
+<Public title={`${bien.titre} — Immo Agence`}>
+    <main class="max-w-4xl mx-auto px-8 py-12">
+        <a href="/biens" class="btn btn-ghost btn-sm mb-6">← Retour</a>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+                {
+                    bien.image_url ? (
+                        <img
+                            src={bien.image_url}
+                            alt={bien.titre}
+                            class="w-full h-72 object-cover rounded-xl"
+                        />
+                    ) : (
+                        <div class="w-full h-72 bg-base-200 rounded-xl flex items-center justify-center">
+                            <span class="text-base-content/30">
+                                Pas de photo
+                            </span>
+                        </div>
+                    )
+                }
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <div>
+                    <span class="badge badge-ghost capitalize mb-2"
+                        >{bien.type_bien}</span
+                    >
+                    <h1 class="text-3xl font-bold">{bien.titre}</h1>
+                    <p class="text-base-content/60 mt-1">
+                        {bien.adresse}{bien.ville ? `, ${bien.ville}` : ""}
+                    </p>
+                </div>
+
+                <p class="text-4xl font-bold text-primary">
+                    {bien.prix.toLocaleString("fr-FR")} €
+                </p>
+
+                {
+                    bien.surface && (
+                        <p class="text-base-content/70">{bien.surface} m²</p>
+                    )
+                }
+
+                {
+                    bien.description && (
+                        <div>
+                            <h2 class="font-semibold mb-1">Description</h2>
+                            <p class="text-base-content/70 leading-relaxed">
+                                {bien.description}
+                            </p>
+                        </div>
+                    )
+                }
+
+                <div class="card bg-base-200 p-4 mt-2">
+                    <h2 class="font-semibold mb-2">Intéressé par ce bien ?</h2>
+                    <p class="text-sm text-base-content/60 mb-3">
+                        Contactez-nous pour organiser une visite.
+                    </p>
+                    <a
+                        href="mailto:contact@immo-agence.fr"
+                        class="btn btn-primary btn-sm"
+                    >
+                        Nous contacter
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+</Public>

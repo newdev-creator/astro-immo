@@ -1,0 +1,75 @@
+---
+import Dashboard from "@layouts/Dashboard.astro";
+import { apiFetch } from "@lib/api";
+
+const user = Astro.locals.user!;
+const res = await apiFetch("/api/stats/", Astro.request);
+const stats = res.ok
+    ? await res.json()
+    : {
+          biens_total: 0,
+          biens_disponibles: 0,
+          biens_vendus: 0,
+          clients_total: 0,
+      };
+---
+
+<Dashboard>
+    <h2 class="text-2xl font-bold mb-6">Bonjour, {user.nom} 👋</h2>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="card bg-base-100 shadow">
+            <div class="card-body">
+                <h3 class="text-sm text-base-content/60">Biens total</h3>
+                <p class="text-3xl font-bold">{stats.biens_total}</p>
+            </div>
+        </div>
+        <div class="card bg-base-100 shadow">
+            <div class="card-body">
+                <h3 class="text-sm text-base-content/60">Disponibles</h3>
+                <p class="text-3xl font-bold text-success">
+                    {stats.biens_disponibles}
+                </p>
+            </div>
+        </div>
+        <div class="card bg-base-100 shadow">
+            <div class="card-body">
+                <h3 class="text-sm text-base-content/60">Vendus</h3>
+                <p class="text-3xl font-bold text-error">
+                    {stats.biens_vendus}
+                </p>
+            </div>
+        </div>
+        <div class="card bg-base-100 shadow">
+            <div class="card-body">
+                <h3 class="text-sm text-base-content/60">Clients</h3>
+                <p class="text-3xl font-bold">{stats.clients_total}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card bg-base-100 shadow">
+            <div class="card-body">
+                <h3 class="card-title text-base">Derniers biens</h3>
+                <a
+                    href="/dashboard/biens"
+                    class="btn btn-primary btn-sm w-fit mt-2"
+                >
+                    Voir tous les biens
+                </a>
+            </div>
+        </div>
+        <div class="card bg-base-100 shadow">
+            <div class="card-body">
+                <h3 class="card-title text-base">Derniers clients</h3>
+                <a
+                    href="/dashboard/clients"
+                    class="btn btn-primary btn-sm w-fit mt-2"
+                >
+                    Voir tous les clients
+                </a>
+            </div>
+        </div>
+    </div>
+</Dashboard>

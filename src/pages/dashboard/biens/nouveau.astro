@@ -1,0 +1,132 @@
+---
+import Dashboard from "@layouts/Dashboard.astro";
+import { apiFetch } from "@lib/api";
+
+if (Astro.request.method === "POST") {
+    const form = await Astro.request.formData();
+    const res = await apiFetch("/api/biens/", Astro.request, {
+        method: "POST",
+        body: JSON.stringify({
+            titre: form.get("titre"),
+            description: form.get("description"),
+            prix: parseFloat(form.get("prix") as string),
+            surface: form.get("surface")
+                ? parseFloat(form.get("surface") as string)
+                : null,
+            ville: form.get("ville"),
+            adresse: form.get("adresse"),
+            type_bien: form.get("type_bien"),
+            statut: form.get("statut"),
+        }),
+    });
+    if (res.ok) return Astro.redirect("/dashboard/biens");
+}
+---
+
+<Dashboard>
+    <div class="max-w-2xl">
+        <h2 class="text-2xl font-bold mb-6">Nouveau bien</h2>
+
+        <form
+            method="POST"
+            class="card bg-base-100 shadow p-6 flex flex-col gap-4"
+        >
+            <div class="form-control">
+                <label class="label"
+                    ><span class="label-text">Titre *</span></label
+                >
+                <input
+                    name="titre"
+                    type="text"
+                    class="input input-bordered"
+                    required
+                />
+            </div>
+            <div class="form-control">
+                <label class="label"
+                    ><span class="label-text">Description</span></label
+                >
+                <textarea
+                    name="description"
+                    class="textarea textarea-bordered"
+                    rows="3"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label"
+                        ><span class="label-text">Prix (€) *</span></label
+                    >
+                    <input
+                        name="prix"
+                        type="number"
+                        step="0.01"
+                        class="input input-bordered"
+                        required
+                    />
+                </div>
+                <div class="form-control">
+                    <label class="label"
+                        ><span class="label-text">Surface (m²)</span></label
+                    >
+                    <input
+                        name="surface"
+                        type="number"
+                        step="0.01"
+                        class="input input-bordered"
+                    />
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label"
+                        ><span class="label-text">Ville</span></label
+                    >
+                    <input
+                        name="ville"
+                        type="text"
+                        class="input input-bordered"
+                    />
+                </div>
+                <div class="form-control">
+                    <label class="label"
+                        ><span class="label-text">Adresse</span></label
+                    >
+                    <input
+                        name="adresse"
+                        type="text"
+                        class="input input-bordered"
+                    />
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label"
+                        ><span class="label-text">Type</span></label
+                    >
+                    <select name="type_bien" class="select select-bordered">
+                        <option value="appartement">Appartement</option>
+                        <option value="maison">Maison</option>
+                        <option value="terrain">Terrain</option>
+                        <option value="commercial">Commercial</option>
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label class="label"
+                        ><span class="label-text">Statut</span></label
+                    >
+                    <select name="statut" class="select select-bordered">
+                        <option value="disponible">Disponible</option>
+                        <option value="vendu">Vendu</option>
+                        <option value="loue">Loué</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex gap-2 justify-end mt-2">
+                <a href="/dashboard/biens" class="btn btn-ghost">Annuler</a>
+                <button type="submit" class="btn btn-primary"
+                    >Créer le bien</button
+                >
+            </div>
+        </form>
+    </div>
+</Dashboard>

@@ -1,0 +1,90 @@
+---
+import Dashboard from "@layouts/Dashboard.astro";
+import { apiFetch } from "@lib/api";
+
+let error = "";
+
+if (Astro.request.method === "POST") {
+    const form = await Astro.request.formData();
+    const res = await apiFetch("/api/agents/", Astro.request, {
+        method: "POST",
+        body: JSON.stringify({
+            nom: form.get("nom"),
+            prenom: form.get("prenom"),
+            email: form.get("email"),
+            password: form.get("password"),
+        }),
+    });
+    if (res.ok) return Astro.redirect("/dashboard/admin/agents");
+    const err = await res.json();
+    error = err.detail ?? "Erreur lors de la création";
+}
+---
+
+<Dashboard>
+    <div class="max-w-2xl">
+        <h2 class="text-2xl font-bold mb-6">Nouvel agent</h2>
+
+        {error && <div class="alert alert-error mb-4">{error}</div>}
+
+        <form
+            method="POST"
+            class="card bg-base-100 shadow p-6 flex flex-col gap-4"
+        >
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label"
+                        ><span class="label-text">Prénom *</span></label
+                    >
+                    <input
+                        name="prenom"
+                        type="text"
+                        class="input input-bordered"
+                        required
+                    />
+                </div>
+                <div class="form-control">
+                    <label class="label"
+                        ><span class="label-text">Nom *</span></label
+                    >
+                    <input
+                        name="nom"
+                        type="text"
+                        class="input input-bordered"
+                        required
+                    />
+                </div>
+            </div>
+            <div class="form-control">
+                <label class="label"
+                    ><span class="label-text">Email *</span></label
+                >
+                <input
+                    name="email"
+                    type="email"
+                    class="input input-bordered"
+                    required
+                />
+            </div>
+            <div class="form-control">
+                <label class="label"
+                    ><span class="label-text">Mot de passe *</span></label
+                >
+                <input
+                    name="password"
+                    type="password"
+                    class="input input-bordered"
+                    required
+                />
+            </div>
+            <div class="flex gap-2 justify-end mt-2">
+                <a href="/dashboard/admin/agents" class="btn btn-ghost"
+                    >Annuler</a
+                >
+                <button type="submit" class="btn btn-primary"
+                    >Créer l'agent</button
+                >
+            </div>
+        </form>
+    </div>
+</Dashboard>

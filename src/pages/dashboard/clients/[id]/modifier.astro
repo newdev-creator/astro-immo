@@ -1,0 +1,126 @@
+---
+import Dashboard from "@layouts/Dashboard.astro";
+import { apiFetch } from "@lib/api";
+
+const { id } = Astro.params;
+
+if (Astro.request.method === "POST") {
+    const form = await Astro.request.formData();
+    const action = form.get("_action");
+
+    if (action === "delete") {
+        await apiFetch(`/api/clients/${id}`, Astro.request, {
+            method: "DELETE",
+        });
+        return Astro.redirect("/dashboard/clients");
+    }
+
+    const res = await apiFetch(`/api/clients/${id}`, Astro.request, {
+        method: "PUT",
+        body: JSON.stringify({
+            nom: form.get("nom"),
+            prenom: form.get("prenom"),
+            email: form.get("email") || null,
+            telephone: form.get("telephone") || null,
+            budget: form.get("budget")
+                ? parseFloat(form.get("budget") as string)
+                : null,
+        }),
+    });
+    if (res.ok) return Astro.redirect("/dashboard/clients");
+}
+
+const res = await apiFetch(`/api/clients/${id}`, Astro.request);
+if (!res.ok) return Astro.redirect("/dashboard/clients");
+const client = await res.json();
+---
+
+<Dashboard>
+    <div class="max-w-2xl">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Modifier le client</h2>
+            <form method="POST">
+                <input type="hidden" name="_action" value="delete" />
+                <button
+                    type="submit"
+                    class="btn btn-error btn-sm"
+                    onclick="return confirm('Supprimer ce client ?')"
+                >
+                    Supprimer
+                </button>
+            </form>
+        </div>
+
+        <form
+            method="POST"
+            class="card bg-base-100 shadow p-6 flex flex-col gap-4"
+        >
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label"
+                        ><span class="label-text">Prénom *</span></label
+                    >
+                    <input
+                        name="prenom"
+                        type="text"
+                        class="input input-bordered"
+                        value={client.prenom}
+                        required
+                    />
+                </div>
+                <div class="form-control">
+                    <label class="label"
+                        ><span class="label-text">Nom *</span></label
+                    >
+                    <input
+                        name="nom"
+                        type="text"
+                        class="input input-bordered"
+                        value={client.nom}
+                        required
+                    />
+                </div>
+            </div>
+            <div class="form-control">
+                <label class="label"
+                    ><span class="label-text">Email</span></label
+                >
+                <input
+                    name="email"
+                    type="email"
+                    class="input input-bordered"
+                    value={client.email}
+                />
+            </div>
+            <div class="form-control">
+                <label class="label"
+                    ><span class="label-text">Téléphone</span></label
+                >
+                <input
+                    name="telephone"
+                    type="tel"
+                    class="input input-bordered"
+                    value={client.telephone}
+                />
+            </div>
+            <div class="form-control">
+                <label class="label"
+                    ><span class="label-text">Budget (€)</span></label
+                >
+                <input
+                    name="budget"
+                    type="number"
+                    step="0.01"
+                    class="input input-bordered"
+                    value={client.budget}
+                />
+            </div>
+            <div class="flex gap-2 justify-end mt-2">
+                <a href="/dashboard/clients" class="btn btn-ghost">Annuler</a>
+                <button type="submit" class="btn btn-primary"
+                    >Enregistrer</button
+                >
+            </div>
+        </form>
+    </div>
+</Dashboard>

@@ -1,0 +1,60 @@
+---
+import Dashboard from "@layouts/Dashboard.astro";
+import { apiFetch } from "@lib/api";
+
+const res = await apiFetch("/api/clients/", Astro.request);
+const clients = res.ok ? await res.json() : [];
+---
+
+<Dashboard>
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Mes clients</h2>
+        <a href="/dashboard/clients/nouveau" class="btn btn-primary btn-sm">
+            + Nouveau client
+        </a>
+    </div>
+
+    {
+        clients.length === 0 ? (
+            <div class="alert">Aucun client pour le moment.</div>
+        ) : (
+            <div class="overflow-x-auto">
+                <table class="table bg-base-100 shadow">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Budget</th>
+                            <th />
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {clients.map((c: any) => (
+                            <tr class="hover">
+                                <td>
+                                    {c.prenom} {c.nom}
+                                </td>
+                                <td>{c.email ?? "—"}</td>
+                                <td>{c.telephone ?? "—"}</td>
+                                <td>
+                                    {c.budget
+                                        ? `${c.budget.toLocaleString("fr-FR")} €`
+                                        : "—"}
+                                </td>
+                                <td>
+                                    <a
+                                        href={`/dashboard/clients/${c.id}/modifier`}
+                                        class="btn btn-ghost btn-xs"
+                                    >
+                                        Éditer
+                                    </a>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        )
+    }
+</Dashboard>
