@@ -10,7 +10,10 @@
     "dev": "concurrently \"pnpm run astro dev\" \"pnpm run api-dev\"",
     "api-dev": "uv run uvicorn src.api.main:app --reload --port 8000",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "test": "pnpm run test:js && pnpm run test:py",
+    "test:js": "vitest run",
+    "test:py": "uv run pytest"
   },
   "dependencies": {
     "@astrojs/vercel": "^10.0.5",
@@ -19,8 +22,10 @@
     "tailwindcss": "^4.2.4"
   },
   "devDependencies": {
+    "@types/node": "^25.6.0",
     "concurrently": "^9.2.1",
-    "daisyui": "^5.5.19"
+    "daisyui": "^5.5.19",
+    "vitest": "^4.1.5"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

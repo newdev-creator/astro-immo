@@ -1,4 +1,4 @@
-function getApiBase(request: Request): string {
+export function getApiBase(request: Request): string {
   const envBase = ((import.meta as any).env?.API_BASE_URL as
     | string
     | undefined)?.trim();

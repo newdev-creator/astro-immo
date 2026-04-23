@@ -1,17 +1,8 @@
 import { defineMiddleware } from "astro:middleware";
+import { parseJWT } from "@lib/jwt";
 
 const PROTECTED_ROUTES = ["/dashboard"];
 const PATRON_ONLY = ["/dashboard/admin"];
-
-function parseJWT(token: string): Record<string, unknown> | null {
-  try {
-    const payload = token.split(".")[1];
-    const decoded = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
-    return JSON.parse(decoded);
-  } catch {
-    return null;
-  }
-}
 
 export const onRequest = defineMiddleware((context, next) => {
   const { pathname } = context.url;
