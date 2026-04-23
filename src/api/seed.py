@@ -1,5 +1,7 @@
 import asyncio
-import selectors
+import sys
+
+from sqlalchemy import select
 
 from .auth import hash_password
 from .database import SessionLocal, init_db
@@ -9,6 +11,13 @@ from .models import Role, User
 async def seed():
     await init_db()
     async with SessionLocal() as db:
+        existing_user = await db.scalar(
+            select(User).where(User.email == "julien@immo.fr")
+        )
+        if existing_user:
+            print("Utilisateur deja present, seed ignore")
+            return
+
         patron = User(
             nom="Freisa",
             prenom="Julien",
@@ -18,12 +27,10 @@ async def seed():
         )
         db.add(patron)
         await db.commit()
-        print("Patron créé ✅")
+        print("Patron cree avec succes")
 
 
-asyncio.run(seed())
-
-# Fix Windows ProactorEventLoop
-asyncio.run(
-    seed(), loop_factory=lambda: asyncio.SelectorEventLoop(selectors.SelectSelector())
-)
+if __name__ == "__main__":
+    if sys.platform.startswith("win"):
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    asyncio.run(seed())
