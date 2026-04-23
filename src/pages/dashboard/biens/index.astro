@@ -7,53 +7,64 @@ const cookie = Astro.request.headers.get("cookie");
 const res = await apiFetch("/api/biens/", Astro.request);
 const biens = res.ok ? await res.json() : [];
 ---
-<Dashboard>
-  <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold">Mes biens</h2>
-    <a href="/dashboard/biens/nouveau" class="btn btn-primary btn-sm">
-      + Nouveau bien
-    </a>
-  </div>
 
-  {biens.length === 0 ? (
-    <div class="alert">Aucun bien pour le moment.</div>
-  ) : (
-    <div class="overflow-x-auto">
-      <table class="table bg-base-100 shadow">
-        <thead>
-          <tr>
-            <th>Titre</th>
-            <th>Type</th>
-            <th>Ville</th>
-            <th>Prix</th>
-            <th>Statut</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {biens.map((b: any) => (
-            <tr class="hover">
-              <td>{b.titre}</td>
-              <td class="capitalize">{b.type_bien}</td>
-              <td>{b.ville ?? "—"}</td>
-              <td>{b.prix.toLocaleString("fr-FR")} €</td>
-              <td>
-                <span class={`badge badge-sm ${
-                  b.statut === "disponible" ? "badge-success" :
-                  b.statut === "vendu" ? "badge-error" : "badge-warning"
-                }`}>
-                  {b.statut}
-                </span>
-              </td>
-              <td class="flex gap-2">
-                <a href={`/dashboard/biens/${b.id}/modifier`} class="btn btn-ghost btn-xs">
-                  Éditer
-                </a>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+<Dashboard>
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Mes biens</h2>
+        <a href="/dashboard/biens/nouveau" class="btn btn-primary btn-sm">
+            + Nouveau bien
+        </a>
     </div>
-  )}
+
+    {
+        biens.length === 0 ? (
+            <div class="alert">Aucun bien pour le moment.</div>
+        ) : (
+            <div class="overflow-x-auto">
+                <table class="table bg-base-100 shadow">
+                    <thead>
+                        <tr>
+                            <th>Titre</th>
+                            <th>Type</th>
+                            <th>Ville</th>
+                            <th>Prix</th>
+                            <th>Statut</th>
+                            <th />
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {biens.map((b: any) => (
+                            <tr class="hover">
+                                <td>{b.titre}</td>
+                                <td class="capitalize">{b.type_bien}</td>
+                                <td>{b.ville ?? "—"}</td>
+                                <td>{b.prix.toLocaleString("fr-FR")} €</td>
+                                <td>
+                                    <span
+                                        class={`badge badge-sm ${
+                                            b.statut === "disponible"
+                                                ? "badge-success"
+                                                : b.statut === "vendu"
+                                                  ? "badge-error"
+                                                  : "badge-warning"
+                                        }`}
+                                    >
+                                        {b.statut}
+                                    </span>
+                                </td>
+                                <td class="flex gap-2">
+                                    <a
+                                        href={`/dashboard/biens/${b.id}/modifier`}
+                                        class="btn btn-ghost btn-xs"
+                                    >
+                                        Éditer
+                                    </a>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        )
+    }
 </Dashboard>

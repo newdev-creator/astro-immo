@@ -1,9 +1,12 @@
-from sqlalchemy import Column, Integer, String, Float, Enum, ForeignKey, Table
-from sqlalchemy.orm import relationship, DeclarativeBase
 import enum
+
+from sqlalchemy import Column, Enum, Float, ForeignKey, Integer, String, Table
+from sqlalchemy.orm import DeclarativeBase, relationship
+
 
 class Base(DeclarativeBase):
     pass
+
 
 # Table d'association Client <-> Bien (achats)
 achats = Table(
@@ -13,20 +16,24 @@ achats = Table(
     Column("bien_id", Integer, ForeignKey("biens.id")),
 )
 
+
 class Role(str, enum.Enum):
     patron = "patron"
     agent = "agent"
+
 
 class StatutBien(str, enum.Enum):
     disponible = "disponible"
     vendu = "vendu"
     loue = "loue"
 
+
 class TypeBien(str, enum.Enum):
     appartement = "appartement"
     maison = "maison"
     terrain = "terrain"
     commercial = "commercial"
+
 
 class User(Base):
     __tablename__ = "users"
@@ -40,6 +47,7 @@ class User(Base):
     biens = relationship("Bien", back_populates="agent")
     clients = relationship("Client", back_populates="agent")
 
+
 class Proprietaire(Base):
     __tablename__ = "proprietaires"
     id = Column(Integer, primary_key=True)
@@ -49,6 +57,7 @@ class Proprietaire(Base):
     telephone = Column(String)
 
     biens = relationship("Bien", back_populates="proprietaire")
+
 
 class Bien(Base):
     __tablename__ = "biens"
@@ -70,6 +79,7 @@ class Bien(Base):
     proprietaire = relationship("Proprietaire", back_populates="biens")
 
     acheteurs = relationship("Client", secondary=achats, back_populates="achats")
+
 
 class Client(Base):
     __tablename__ = "clients"

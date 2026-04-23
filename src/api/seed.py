@@ -1,7 +1,9 @@
 import asyncio
-from .database import SessionLocal, init_db
-from .models import User, Role
+
 from .auth import hash_password
+from .database import SessionLocal, init_db
+from .models import Role, User
+
 
 async def seed():
     await init_db()
@@ -11,10 +13,11 @@ async def seed():
             prenom="Julien",
             email="julien@immo.fr",
             hashed_password=hash_password("admin1234"),
-            role=Role.patron
+            role=Role.patron,
         )
         db.add(patron)
         await db.commit()
         print("Patron créé ✅")
+
 
 asyncio.run(seed())

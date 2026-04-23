@@ -1,28 +1,36 @@
 ---
 if (Astro.locals.user) return Astro.redirect("/dashboard");
 ---
+
 <html>
-  <body>
-    <h1>Login</h1>
-    <form id="loginForm">
-      <input type="email" name="email" placeholder="Email" required />
-      <input type="password" name="password" placeholder="Mot de passe" required />
-      <button type="submit">Connexion</button>
-    </form>
-    <script>
-      document.getElementById("loginForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const form = e.target as HTMLFormElement;
-        const res = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: form.email.value,
-            password: form.password.value,
-          }),
-        });
-        if (res.ok) window.location.href = "/dashboard";
-      });
-    </script>
-  </body>
+    <body>
+        <h1>Login</h1>
+        <form id="loginForm">
+            <input type="email" name="email" placeholder="Email" required />
+            <input
+                type="password"
+                name="password"
+                placeholder="Mot de passe"
+                required
+            />
+            <button type="submit">Connexion</button>
+        </form>
+        <script>
+            document
+                .getElementById("loginForm")
+                .addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    const form = e.target as HTMLFormElement;
+                    const res = await fetch("/api/auth/login", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            email: form.email.value,
+                            password: form.password.value,
+                        }),
+                    });
+                    if (res.ok) window.location.href = "/dashboard";
+                });
+        </script>
+    </body>
 </html>
