@@ -1,8 +1,9 @@
 ---
 import Public from "@layouts/Public.astro";
+import { apiFetch } from "@lib/api";
 
 const { id } = Astro.params;
-const res = await fetch(`http://localhost:8000/api/biens/publics/${id}`);
+const res = await apiFetch(`/api/biens/publics/${id}`, Astro.request);
 if (!res.ok) return Astro.redirect("/biens");
 const bien = await res.json();
 ---

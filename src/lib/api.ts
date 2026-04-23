@@ -19,7 +19,9 @@ export function apiFetch(
     : new URL(path, base).toString();
 
   const headers = new Headers(options.headers);
-  if (!headers.has("Content-Type")) {
+  const hasFormDataBody =
+    typeof FormData !== "undefined" && options.body instanceof FormData;
+  if (!headers.has("Content-Type") && !hasFormDataBody) {
     headers.set("Content-Type", "application/json");
   }
   if (allCookies && !headers.has("cookie")) {

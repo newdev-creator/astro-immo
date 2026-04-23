@@ -1,5 +1,6 @@
 ---
 import Public from "@layouts/Public.astro";
+import { apiFetch } from "@lib/api";
 
 const { searchParams } = Astro.url;
 const type_bien = searchParams.get("type_bien") ?? "";
@@ -11,7 +12,9 @@ if (type_bien) params.set("type_bien", type_bien);
 if (ville) params.set("ville", ville);
 if (prix_max) params.set("prix_max", prix_max);
 
-const res = await fetch(`http://localhost:8000/api/biens/publics?${params}`);
+const query = params.toString();
+const path = query ? `/api/biens/publics?${query}` : "/api/biens/publics";
+const res = await apiFetch(path, Astro.request);
 const biens = res.ok ? await res.json() : [];
 ---
 

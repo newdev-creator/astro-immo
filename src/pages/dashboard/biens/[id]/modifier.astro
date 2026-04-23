@@ -16,17 +16,10 @@ if (Astro.request.method === "POST") {
     if (action === "upload") {
         const file = form.get("image") as File;
         if (file && file.size > 0) {
-            const cookie = Astro.request.headers.get("cookie") ?? "";
-            const accessToken =
-                cookie
-                    .split(";")
-                    .find((c) => c.trim().startsWith("access_token="))
-                    ?.trim() ?? "";
             const formData = new FormData();
             formData.append("file", file);
-            await fetch(`http://localhost:8000/api/biens/${id}/image`, {
+            await apiFetch(`/api/biens/${id}/image`, Astro.request, {
                 method: "POST",
-                headers: { cookie: accessToken },
                 body: formData,
             });
         }
