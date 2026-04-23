@@ -9,7 +9,9 @@ from .models import Base
 
 load_dotenv()
 
-raw_url = os.getenv("DATABASE_URL")
+raw_url = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL")
+if raw_url:
+    raw_url = raw_url.strip().strip("'").strip('"')
 
 if raw_url and raw_url.startswith("postgresql"):
     # Neon : postgresql -> postgresql+psycopg
